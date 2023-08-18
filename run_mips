@@ -1,0 +1,34 @@
+#!/bin/bash
+
+if [ $# -ne 1 ]; then
+    echo "Usage: $0 <filename.asm>"
+    exit 1
+fi
+
+
+filename="$1"
+asm_file="$filename"
+obj_file="${filename%.asm}.o"
+executable_file="${filename%.asm}"
+
+
+echo "[Assembling] mips-linux-gnu-as "$asm_file" -o "$obj_file""
+
+mips-linux-gnu-as "$asm_file" -o "$obj_file"
+
+echo "[Compiling] mips-linux-gnu-gcc \"$obj_file\" -o \"$executable_file\" -nostdlib -static"
+
+mips-linux-gnu-gcc "$obj_file" -o "$executable_file" -nostdlib -static
+
+echo "[Running] qemu-mips-static "./$executable_file""
+
+qemu-mips-static "./$executable_file"
+
+
+# Capture the exit code
+exit_code="$?"
+echo "Output: $exit_code"
+
+# Clear Compile Files
+rm $obj_file $executable_file
+
